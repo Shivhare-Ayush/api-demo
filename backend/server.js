@@ -24,7 +24,15 @@ app.use(cors());
 // GET /api/grades/overall
 app.get('/api/grades/overall', async (req, res) => {
   try {
-    const externalAPIUrl = 'https://api.utdnebula.com/grades/overall';
+    const { prefix, number } = req.query;
+    console.log('Received prefix:', prefix);
+    console.log('Received number:', number);
+
+    if (!prefix || !number) {
+      return res.status(400).json({ error: 'Course prefix and number are required' });
+    }
+
+    const externalAPIUrl = `https://api.utdnebula.com/grades/overall?prefix=${prefix}&number=${number}`;
     const response = await fetch(externalAPIUrl, {
       method: 'GET',
       headers: {
@@ -34,17 +42,17 @@ app.get('/api/grades/overall', async (req, res) => {
     });
 
     if (!response.ok) {
-      throw new Error(`Error from Grades Nebula API: ${response.statusText}`);
+      const errorText = await response.text(); // Get the error message from the external API
+      throw new Error(`Error from Grades Nebula API: ${errorText}`);
     }
 
     const data = await response.json();
     res.json(data);
   } catch (error) {
     console.error('Error fetching data from Nebula API:', error.message);
-    res.status(500).json({ error: 'Internal Server Error' });
+    res.status(500).json({ error: error.message }); // Send the error message to the frontend
   }
 });
-
 
 // GET /api/events/:date
 app.get('/api/events/:date', async (req, res) => {

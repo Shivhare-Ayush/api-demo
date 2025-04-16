@@ -7,12 +7,16 @@ import { Inter } from 'next/font/google';
 const inter = Inter({ subsets: ['latin'] });
 
 export default function Home() {
-  const [overallGrades, setOverallGrades] = useState(null);
   const [events, setEvents] = useState(null);
   const [inputDate, setInputDate] = useState(''); // State to hold the input date
   const [isClicked, setIsClicked] = useState(false); // State to track button click
-  
-  // Fetch overall grades from the API
+  const [coursePrefix, setCoursePrefix] = useState(''); // State to hold the course code (e.g., "CS")
+  const [courseNumber, setCourseNumber] = useState(''); // State to hold the course number (e.g., "1200")
+  const [grades, setGrades] = useState(null); // State to hold the grades data
+  // used for grades distribution table
+  const gradeLabels = ['A+', 'A', 'A-', 'B+', 'B', 'B-', 'C+', 'C', 'C-', 'D+', 'D', 'D-', 'F'];
+
+  /* Fetch overall grades from the API
   useEffect(() => {
     fetch('http://localhost:4000/api/grades/overall')
       .then((res) => res.json())
@@ -22,7 +26,7 @@ export default function Home() {
       .catch((error) => {
         console.error('Error fetching overall grades:', error);
       });
-  }, []);
+  }, []); */
 
   // Fetch events from the API
   const fetchEventsForDate = async (date) => {
@@ -50,7 +54,31 @@ export default function Home() {
     }
     setIsClicked(true); // Set the button as clicked
     fetchEventsForDate(inputDate); // Use the user-provided date
-    
+  };
+
+  const fetchGradesForCourse = async (prefix, number) => {
+    try {
+      const res = await fetch(`http://localhost:4000/api/grades/overall?prefix=${prefix}&number=${number}`);
+      if (!res.ok) {
+        const errorData = await res.json(); // Extract the error message from the response
+        throw new Error(errorData.error || 'Unknown error occurred');
+      }
+
+      const data = await res.json();
+      console.log(data.data);
+      setGrades(data); // Update the grades state with the fetched data
+    } catch (error) {
+      console.error('Error fetching grades:', error.message); // Log the error message
+      alert(`Error: ${error.message}`); // Optionally, show the error to the user
+    }
+  };
+
+  const handleFetchGrades = () => {
+    if (!coursePrefix || !courseNumber) {
+      alert('Please enter both a course prefix and course number.');
+      return;
+    }
+    fetchGradesForCourse(coursePrefix, courseNumber); // Call the API with user-provided parameters
   };
 
   // Frontend Design
@@ -123,9 +151,53 @@ export default function Home() {
           )}
           </div>
         </div>
-        <div className="bg-gray-100 border border-gray-300 rounded-lg shadow-md p-6 w-1/3">
-          <h2 className="text-2xl text-black font-bold mb-4">/grades/overall</h2>
-          <p className="text-gray-700">This is the content of the second card. Add any relevant information here.</p>
+        <div className=" border-4 border-dashed border-black rounded-lg shadow-md p-6 w-1/3 h-full ">
+          <div className="flex items-center justify-center mb-4 w-full">
+            <h2 className="text-xl text-black font-bold mr-20 ">/grades/overall</h2>
+            <input
+              type="text"
+              placeholder="CS"
+              value={coursePrefix}
+              onChange={(e) => setCoursePrefix(e.target.value)} // Update state on input change
+              className="bg-neutral-100 p-2 border-2 border-neutral-800 border-b-4 text-black rounded mr-1 w-1/5"/>
+              <input
+              type="text"
+              placeholder="1200"
+              value={courseNumber}
+              onChange={(e) => setCourseNumber(e.target.value)} // Update state on input change
+              className="bg-neutral-100 p-2 border-2 border-neutral-800 border-b-4 text-black rounded mr-3 w-2/6"/>
+              <button
+              className={`bg-green-300 text-white center font-bold py-2 px-4 w-1/6 rounded border-2 border-neutral-800 ${
+                isClicked ? 'border-b-2' : 'border-b-4'
+              } hover:border-green-950 hover:text-black transition duration-300 ease-in-out`}
+              onClick={handleFetchGrades}
+              >
+              GET
+              </button>
+          </div>
+          <p className="text-gray-700">Grade Distribution for the selected Class:</p>
+          <div className="h-1/2 overflow-y-auto">
+          {grades && grades.data ? (
+            <table className="table-fixed w-full bg-gray-200 rounded mt-4 text-sm text-black ">
+              <thead>
+                <tr className="bg-gray-300 border border-b-3">
+                  <th className="px-4 py-2 border">Grade</th>
+                  <th className="px-4 py-2 border">Grade Distribution</th>
+                </tr>
+              </thead>
+              <tbody>
+                {grades && grades.data && gradeLabels.map((label, index) => (
+                  <tr key={index}>
+                    <td className="px-4 py-2 border">{label}</td>
+                    <td className="px-4 py-2 border">{grades.data[index] || 0}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          ) : (
+            <p className="text-gray-500">No data fetched yet.</p>
+          )}
+          </div>
         </div>
       </div>
     </div>
