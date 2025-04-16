@@ -1,5 +1,4 @@
 "use client";
-
 import { useState, useEffect } from 'react';
 import './globals.css';
 import { Inter } from 'next/font/google';
@@ -8,25 +7,13 @@ const inter = Inter({ subsets: ['latin'] });
 
 export default function Home() {
   const [events, setEvents] = useState(null);
-  const [inputDate, setInputDate] = useState(''); // State to hold the input date
-  const [isClicked, setIsClicked] = useState(false); // State to track button click
+  const [grades, setGrades] = useState(null);
+  const [inputDate, setInputDate] = useState(''); // State to hold the input date  (e.g., "2025-04-16")
+  const [isClicked, setIsClicked] = useState(false); // State to track button click (Events)
+  const [isClicked2, setIsClicked2] = useState(false); // State to track button click (Grades)
   const [coursePrefix, setCoursePrefix] = useState(''); // State to hold the course code (e.g., "CS")
   const [courseNumber, setCourseNumber] = useState(''); // State to hold the course number (e.g., "1200")
-  const [grades, setGrades] = useState(null); // State to hold the grades data
-  // used for grades distribution table
-  const gradeLabels = ['A+', 'A', 'A-', 'B+', 'B', 'B-', 'C+', 'C', 'C-', 'D+', 'D', 'D-', 'F'];
-
-  /* Fetch overall grades from the API
-  useEffect(() => {
-    fetch('http://localhost:4000/api/grades/overall')
-      .then((res) => res.json())
-      .then((data) => {
-        setOverallGrades(data);
-      })
-      .catch((error) => {
-        console.error('Error fetching overall grades:', error);
-      });
-  }, []); */
+  const gradeLabels = ['A+', 'A', 'A-', 'B+', 'B', 'B-', 'C+', 'C', 'C-', 'D+', 'D', 'D-', 'F'];   // used for grades distribution table
 
   // Fetch events from the API
   const fetchEventsForDate = async (date) => {
@@ -67,6 +54,7 @@ export default function Home() {
       const data = await res.json();
       console.log(data.data);
       setGrades(data); // Update the grades state with the fetched data
+      setIsClicked2(false);
     } catch (error) {
       console.error('Error fetching grades:', error.message); // Log the error message
       alert(`Error: ${error.message}`); // Optionally, show the error to the user
@@ -79,9 +67,10 @@ export default function Home() {
       return;
     }
     fetchGradesForCourse(coursePrefix, courseNumber); // Call the API with user-provided parameters
+    setIsClicked2(true); // Set the button as clicked
   };
 
-  // Frontend Design
+  // ---Frontend Design---
   return (
     <div className={inter.className}>
     <div className=" flex flex-col items-center ">
@@ -100,8 +89,9 @@ export default function Home() {
       <p className="text-gray-600 text-center mb-4 p-1">The public Nebula Labs API for access to pertinent UT Dallas data.</p>
       {/* Body */}
       
-      <div className=" flex items-center justify-between backdrop-blur-sm rounded-xl p-7 m-10 shadow-lg w-screen h-screen overflow-hidden">
-        <div className=" border-4 border-dashed border-black rounded-lg shadow-md p-6 w-1/2 h-full ">
+      <div className=" flex items-center justify-between rounded-xl p-7 m-10  w-screen h-screen overflow-hidden">
+        {/* Events Section */}
+        <div className=" border-4 border-dashed border-black rounded-lg p-6 w-1/2 h-full shadow-lg backdrop-blur-sm">
           <div className="flex items-center justify-center mb-4 w-full">
             <h2 className="text-xl text-black font-bold mr-20 ">/events/{"{date}"}</h2>
             <input
@@ -121,6 +111,7 @@ export default function Home() {
           </div>
           <p className="text-gray-700">Events for the selected date:</p>
           <div className="h-1/2 overflow-y-auto">
+          {/* Events Table */}
           {events && events.data && events.data.buildings ? (
             <table className="table-fixed w-full bg-gray-200 rounded mt-4 text-sm text-black ">
               <thead>
@@ -151,6 +142,7 @@ export default function Home() {
           )}
           </div>
         </div>
+        {/* Grades Section */}
         <div className=" border-4 border-dashed border-black rounded-lg shadow-md p-6 w-1/3 h-full ">
           <div className="flex items-center justify-center mb-4 w-full">
             <h2 className="text-xl text-black font-bold mr-20 ">/grades/overall</h2>
@@ -168,7 +160,7 @@ export default function Home() {
               className="bg-neutral-100 p-2 border-2 border-neutral-800 border-b-4 text-black rounded mr-3 w-2/6"/>
               <button
               className={`bg-green-300 text-white center font-bold py-2 px-4 w-1/6 rounded border-2 border-neutral-800 ${
-                isClicked ? 'border-b-2' : 'border-b-4'
+                isClicked2 ? 'border-b-2' : 'border-b-4'
               } hover:border-green-950 hover:text-black transition duration-300 ease-in-out`}
               onClick={handleFetchGrades}
               >
@@ -177,6 +169,7 @@ export default function Home() {
           </div>
           <p className="text-gray-700">Grade Distribution for the selected Class:</p>
           <div className="h-1/2 overflow-y-auto">
+          {/* Grades Table */}
           {grades && grades.data ? (
             <table className="table-fixed w-full bg-gray-200 rounded mt-4 text-sm text-black ">
               <thead>
@@ -200,6 +193,29 @@ export default function Home() {
           </div>
         </div>
       </div>
+      {/* POST Call */}
+      <div className=" flex items-center w-screen overflow-hidden">
+      <div className="border-4 border-dashed border-black rounded-lg p-6 w-full h-full shadow-lg backdrop-blur-sm mx-7">
+          <div className="flex items-center justify-center mb-4 w-full">
+            <h2 className="text-xl text-black font-bold mr-20 ">/events/{"{date}"}</h2> 
+            <input
+              type="text"
+              placeholder="Enter date (e.g., 2025-04-16)"
+              value={inputDate}
+              onChange={(e) => setInputDate(e.target.value)} // Update state on input change
+              className="bg-neutral-100 p-2 border-2 border-neutral-800 border-b-4 text-black rounded mr-3 w-3/6"/>
+              <button
+              className={`bg-green-300 text-white center font-bold py-2 px-4 w-1/6 rounded border-2 border-neutral-800 ${
+                isClicked ? 'border-b-2' : 'border-b-4'
+              } hover:border-green-950 hover:text-black transition duration-300 ease-in-out`}
+              onClick={handleFetchEvents}
+              >
+              POST
+              </button>
+          </div>
+          <p className="text-gray-700">Events for the selected date:</p>
+        </div>
+    </div>
     </div>
     </div>
   );
