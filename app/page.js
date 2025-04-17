@@ -15,7 +15,7 @@ export default function Home() {
   const [courseNumber, setCourseNumber] = useState(''); // State to hold the course number (e.g., "1200")
   const gradeLabels = ['A+', 'A', 'A-', 'B+', 'B', 'B-', 'C+', 'C', 'C-', 'D+', 'D', 'D-', 'F'];   // used for grades distribution table
 
-  // Fetch events from the API
+  // ₊˚ ✧ ━━━━⊱ Fetch events from the API (go to line 37 (handleFetchEvents) to see how the date is used) ⊰━━━━ ✧ ₊˚
   const fetchEventsForDate = async (date) => {
     try {
       const res = await fetch(`http://localhost:4000/api/events/${date}`);
@@ -33,7 +33,7 @@ export default function Home() {
       console.error('Error fetching events:', error);
     }
   };
-
+  // ₊˚ ✧ ━━━━⊱ Fetch events on button click line 107 ⊰━━━━ ✧ ₊˚ 
   const handleFetchEvents = () => {
     if (!inputDate) {
       alert('Please enter a valid date.');
@@ -73,7 +73,7 @@ export default function Home() {
   // ---Frontend Design---
   return (
     <div className={inter.className}>
-    <div className=" flex flex-col items-center ">
+    <div className=" flex flex-col items-center overflow-x-hidden">
       {/* Header */}
       <div className="bg-white backdrop-blur-sm border-2 border-black border-b-4 rounded-xl p-7 m-10 mb-0 shadow-lg w-1/2">
       <div className="flex items-center justify-between">
@@ -104,7 +104,7 @@ export default function Home() {
               className={`bg-green-300 text-white center font-bold py-2 px-4 w-1/6 rounded border-2 border-neutral-800 ${
                 isClicked ? 'border-b-2' : 'border-b-4'
               } hover:border-green-950 hover:text-black transition duration-300 ease-in-out`}
-              onClick={handleFetchEvents}
+              onClick={handleFetchEvents} 
               >
               GET
               </button>
@@ -150,7 +150,7 @@ export default function Home() {
               type="text"
               placeholder="CS"
               value={coursePrefix}
-              onChange={(e) => setCoursePrefix(e.target.value)} // Update state on input change
+              onChange={(e) => setCoursePrefix(e.target.value.toUpperCase())} // Ensure input is always uppercase
               className="bg-neutral-100 p-2 border-2 border-neutral-800 border-b-4 text-black rounded mr-1 w-1/5"/>
               <input
               type="text"
@@ -193,9 +193,9 @@ export default function Home() {
           </div>
         </div>
       </div>
-      {/* POST Call */}
+      {/* POST Call 
       <div className=" flex items-center w-screen overflow-hidden">
-      <div className="border-4 border-dashed border-black rounded-lg p-6 w-full h-full shadow-lg backdrop-blur-sm mx-7">
+      <div className="border-4 border-dashed border-black rounded-lg p-6 w-full h-full shadow-lg backdrop-blur-sm mx-7 mb-7">
           <div className="flex items-center justify-center mb-4 w-full">
             <h2 className="text-xl text-black font-bold mr-20 ">/events/{"{date}"}</h2> 
             <input
@@ -214,8 +214,8 @@ export default function Home() {
               </button>
           </div>
           <p className="text-gray-700">Events for the selected date:</p>
-        </div>
-    </div>
+        </div> 
+    </div> */} 
     </div>
     </div>
   );
