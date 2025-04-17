@@ -15,8 +15,8 @@ export default function Home() {
   const [courseNumber, setCourseNumber] = useState(''); // State to hold the course number (e.g., "1200")
   const gradeLabels = ['A+', 'A', 'A-', 'B+', 'B', 'B-', 'C+', 'C', 'C-', 'D+', 'D', 'D-', 'F'];   // used for grades distribution table
 
-  // ₊˚ ✧ ━━━━⊱ Fetch events from the API (go to line 37 (handleFetchEvents) to see how the date is used) ⊰━━━━ ✧ ₊˚
-  const fetchEventsForDate = async (date) => {
+  // ₊˚ ✧ ━━━━⊱ Fetch events from the API  ⊰━━━━ ✧ ₊˚
+  const fetchEventsForDate = async (date) => { //called by HandleFetchEvents (line 37)
     try {
       const res = await fetch(`http://localhost:4000/api/events/${date}`);
       if (!res.ok) {
@@ -33,8 +33,8 @@ export default function Home() {
       console.error('Error fetching events:', error);
     }
   };
-  // ₊˚ ✧ ━━━━⊱ Fetch events on button click line 107 ⊰━━━━ ✧ ₊˚ 
-  const handleFetchEvents = () => {
+  // ₊˚ ✧ ━━━━⊱ Fetch events  ⊰━━━━ ✧ ₊˚ 
+  const handleFetchEvents = () => { // called by onClick (line 107)
     if (!inputDate) {
       alert('Please enter a valid date.');
       return;
@@ -42,8 +42,8 @@ export default function Home() {
     setIsClicked(true); // Set the button as clicked
     fetchEventsForDate(inputDate); // Use the user-provided date
   };
-
-  const fetchGradesForCourse = async (prefix, number) => {
+  // ₊˚ ✧ ━━━━⊱ Fetch grades from the API  ⊰━━━━ ✧ ₊˚
+  const fetchGradesForCourse = async (prefix, number) => { //called by HandleFetchGrades (line 64)
     try {
       const res = await fetch(`http://localhost:4000/api/grades/overall?prefix=${prefix}&number=${number}`);
       if (!res.ok) {
@@ -60,13 +60,13 @@ export default function Home() {
       alert(`Error: ${error.message}`); // Optionally, show the error to the user
     }
   };
-
-  const handleFetchGrades = () => {
+  // ₊˚ ✧ ━━━━⊱ Fetch grades from the API  ⊰━━━━ ✧ ₊˚
+  const handleFetchGrades = () => { // called by onClick (line 165)
     if (!coursePrefix || !courseNumber) {
       alert('Please enter both a course prefix and course number.');
       return;
     }
-    fetchGradesForCourse(coursePrefix, courseNumber); // Call the API with user-provided parameters
+    fetchGradesForCourse(coursePrefix, courseNumber); 
     setIsClicked2(true); // Set the button as clicked
   };
 
@@ -77,7 +77,7 @@ export default function Home() {
       {/* Header */}
       <div className="bg-white backdrop-blur-sm border-2 border-black border-b-4 rounded-xl p-7 m-10 mb-0 shadow-lg w-1/2">
       <div className="flex items-center justify-between">
-        <a href="https://www.acmutd.org/" target="_blank" rel="noopener noreferrer">
+        <a href="https://www.acmutd.co/" target="_blank" rel="noopener noreferrer">
           <img src={'/ACM_Education_Logo.svg'} alt="ACM Logo" className="w-12 h-auto"/>
         </a>
         <h1 className="text-5xl text-black font-bold text-center">API Workshop</h1>
@@ -104,7 +104,7 @@ export default function Home() {
               className={`bg-green-300 text-white center font-bold py-2 px-4 w-1/6 rounded border-2 border-neutral-800 ${
                 isClicked ? 'border-b-2' : 'border-b-4'
               } hover:border-green-950 hover:text-black transition duration-300 ease-in-out`}
-              onClick={handleFetchEvents} 
+              onClick={handleFetchEvents} //  ₊˚ ✧ ━━━━⊱ calls handleFetchEvents function ⊰━━━━ ✧ ₊˚ 
               >
               GET
               </button>
@@ -162,7 +162,7 @@ export default function Home() {
               className={`bg-green-300 text-white center font-bold py-2 px-4 w-1/6 rounded border-2 border-neutral-800 ${
                 isClicked2 ? 'border-b-2' : 'border-b-4'
               } hover:border-green-950 hover:text-black transition duration-300 ease-in-out`}
-              onClick={handleFetchGrades}
+              onClick={handleFetchGrades} //  ₊˚ ✧ ━━━━⊱ calls handleFetchGrades function ⊰━━━━ ✧ ₊˚
               >
               GET
               </button>
